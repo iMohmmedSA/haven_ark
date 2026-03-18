@@ -13,7 +13,8 @@ fn main() -> iced::Result {
     window_settings.icon = Some(load_icon());
 
     iced::application(App::new, App::update, App::view)
-        .theme(App::theme())
+        .title(App::title)
+        .theme(App::theme)
         .window(window_settings)
         .run()
 }

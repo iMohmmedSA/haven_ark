@@ -5,4 +5,4 @@ edition = "2024"
 
 [dependencies]
 iced = { git = "https://github.com/iced-rs/iced", rev = "b655cb6ebf4a71ea16a4460bb987cb7c1bd0760e" }
-image = "0.25.9"
+image = "0.25"

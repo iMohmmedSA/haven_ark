@@ -6,7 +6,7 @@ use iced::{
     widget::{Button, Column, Text},
 };
 
-use crate::{component::gate_view, theme::token::color};
+use crate::{component::gate_view, constants::APP_NAME, theme::token::color};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {}
@@ -19,7 +19,7 @@ impl App {
         (Self, Task::none())
     }
 
-    pub fn theme() -> Theme {
+    pub fn theme(&self) -> Theme {
         let palette = Palette {
             background: color::BG,
             text: color::TEXT,
@@ -31,6 +31,10 @@ impl App {
         let theme = Custom::new("GrayScale".into(), palette);
 
         Theme::Custom(Arc::new(theme))
+    }
+
+    pub fn title(&self) -> String {
+        "APP_NAME".to_string()
     }
 }
 
