@@ -1,7 +1,8 @@
 use iced::{
-    Element, Length,
+    Element,
     alignment::{Horizontal, Vertical},
-    widget::{Column, Container, Text, column, container, row, space::vertical, text::secondary},
+    font::Weight,
+    widget::{Column, Container, Text, center, column, container, row, text::secondary},
 };
 
 use crate::{
@@ -17,7 +18,7 @@ pub fn gate_view<'a, M: 'a>(content: impl Into<Element<'a, M>>) -> Column<'a, M>
     let header = row![
         // FIX: there is a spacing issue in the logo
         Icons::Logo.symbol().size(font_size::DISPLAY),
-        Text::new(APP_NAME).bold().size(font_size::XL)
+        Text::new(APP_NAME).weight(Weight::Bold).size(font_size::XL)
     ]
     .align_y(Vertical::Center)
     .padding(space::XL)
@@ -27,11 +28,11 @@ pub fn gate_view<'a, M: 'a>(content: impl Into<Element<'a, M>>) -> Column<'a, M>
             .size(font_size::SM)
             .style(secondary),
     )
-    .padding(space::XL);
+    .padding(space::XXL);
 
-    column![header, vertical(), body(content), vertical(), footer].align_x(Horizontal::Center)
+    column![header, body(content), footer].align_x(Horizontal::Center)
 }
 
 fn body<'a, M: 'a>(content: impl Into<Element<'a, M>>) -> Container<'a, M> {
-    Container::new(Container::new(content).padding(20).style(card)).center(Length::Fill)
+    center(Container::new(content).padding(space::XXL).style(card))
 }

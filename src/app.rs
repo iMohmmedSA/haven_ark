@@ -1,22 +1,39 @@
 use std::sync::Arc;
 
 use iced::{
-    Task, Theme,
+    Element, Task, Theme,
     theme::{Custom, Palette},
-    widget::{Column, Text},
 };
 
-use crate::{component::gate_view, constants::APP_NAME, theme::token::color};
+use crate::{
+    constants::APP_NAME,
+    theme::token::color,
+    views::plex_sign_in_view::{self, PlexSignInView},
+};
+
+#[derive(Debug)]
+enum View {
+    PlexSignIn(PlexSignInView),
+}
 
 #[derive(Debug, Clone, Copy)]
-pub enum Message {}
+pub enum Message {
+    PlexSignIn(plex_sign_in_view::Message),
+}
 
-#[derive(Default, Debug)]
-pub struct App;
+#[derive(Debug)]
+pub struct App {
+    view: View,
+}
 
 impl App {
     pub fn new() -> (Self, Task<Message>) {
-        (Self, Task::none())
+        (
+            Self {
+                view: View::PlexSignIn(PlexSignInView::new()),
+            },
+            Task::none(),
+        )
     }
 
     pub fn theme(&self) -> Theme {
@@ -43,7 +60,10 @@ impl App {
 }
 
 impl App {
-    pub fn view(&self) -> Column<'_, Message> {
-        gate_view(Text::new("Test"))
+    pub fn view(&self) -> Element<'_, Message> {
+        match &self.view {
+            View::PlexSignIn(view) => view.view().map(Message::PlexSignIn),
+        }
+        .into()
     }
 }

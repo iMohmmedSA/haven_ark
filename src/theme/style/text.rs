@@ -1,13 +1,13 @@
 use iced::{Font, font, widget::Text};
 
 pub trait TextExt {
-    fn bold(self) -> Self;
+    fn weight(self, weight: font::Weight) -> Self;
 }
 
 impl TextExt for Text<'_> {
-    fn bold(self) -> Self {
+    fn weight(self, weight: font::Weight) -> Self {
         self.font(Font {
-            weight: font::Weight::Bold,
+            weight,
             ..Font::DEFAULT
         })
     }
