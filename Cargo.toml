@@ -2,6 +2,11 @@
 name = "haven_ark"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.85"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/iMohmmedSA/haven_ark"
+
 
 [dependencies]
 iced = { git = "https://github.com/iced-rs/iced", rev = "b655cb6ebf4a71ea16a4460bb987cb7c1bd0760e" }
