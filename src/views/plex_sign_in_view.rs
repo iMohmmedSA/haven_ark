@@ -7,15 +7,20 @@ use iced::{
 
 use crate::{
     component::{Icons, gate_view},
+    constants::GITHUB_URL,
     theme::{
         style::{self, button, text::TextExt},
         token::{color, font_size, space},
     },
 };
 
+pub enum Action {
+    None,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
-    Test,
+    OpenLink,
 }
 
 #[derive(Debug)]
@@ -27,7 +32,18 @@ impl PlexSignInView {
     }
 }
 
-impl PlexSignInView {}
+impl PlexSignInView {
+    pub fn update(&mut self, message: Message) -> Action {
+        match message {
+            Message::OpenLink => self.handle_open_link(),
+        }
+    }
+
+    fn handle_open_link(&mut self) -> Action {
+        let _ = open::that(GITHUB_URL);
+        Action::None
+    }
+}
 
 impl PlexSignInView {
     pub fn view(&self) -> Element<'_, Message> {
@@ -50,7 +66,7 @@ impl PlexSignInView {
             .width(Length::Fill)
             .align_y(Vertical::Center)
             .spacing(space::SM))
-            .on_press(Message::Test)
+            .on_press(Message::OpenLink)
             .style(button::primary)
             .padding(Padding::ZERO.vertical(space::MD)),
 
@@ -72,7 +88,7 @@ impl PlexSignInView {
             .width(Length::Fill)
             .align_y(Vertical::Center)
             .spacing(space::SM))
-            .on_press(Message::Test)
+            .on_press(Message::OpenLink)
             .style(button::outline)
             .padding(Padding::ZERO.vertical(space::MD)),
 
@@ -81,7 +97,7 @@ impl PlexSignInView {
             row![
                 horizontal(),
                 Button::new(Text::new("GitHub").size(font_size::MD))
-                    .on_press(Message::Test)
+                    .on_press(Message::OpenLink)
                     .style(button::secondary_text)
                     .padding(Padding::ZERO.vertical(space::MD)),
                 horizontal()

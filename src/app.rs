@@ -3,6 +3,7 @@ use std::sync::Arc;
 use iced::{
     Element, Task, Theme,
     theme::{Custom, Palette},
+    widget::Text,
 };
 
 use crate::{
@@ -14,6 +15,7 @@ use crate::{
 #[derive(Debug)]
 enum View {
     PlexSignIn(PlexSignInView),
+    Tmp,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -56,14 +58,28 @@ impl App {
 }
 
 impl App {
-    pub fn update(&mut self, message: Message) {}
+    pub fn update(&mut self, message: Message) -> Task<Message> {
+        match message {
+            Message::PlexSignIn(msg) => self.handle_plex_sign_in(msg),
+        }
+    }
+
+    fn handle_plex_sign_in(&mut self, message: plex_sign_in_view::Message) -> Task<Message> {
+        let View::PlexSignIn(view) = &mut self.view else {
+            return Task::none();
+        };
+        use plex_sign_in_view::Action::*;
+        match view.update(message) {
+            None => Task::none(),
+        }
+    }
 }
 
 impl App {
     pub fn view(&self) -> Element<'_, Message> {
         match &self.view {
-            View::PlexSignIn(view) => view.view().map(Message::PlexSignIn),
+            View::PlexSignIn(view) => view.view().map(Message::PlexSignIn).into(),
+            View::Tmp => Text::new("fragment").into(),
         }
-        .into()
     }
 }

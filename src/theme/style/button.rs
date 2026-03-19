@@ -1,8 +1,5 @@
-// Re-export button styles from iced
-pub use iced::widget::button::text;
-
 use iced::{
-    Background, Color, Shadow, Theme, Vector, border,
+    Background, Shadow, Theme, border,
     widget::button::{Status, Style},
 };
 
@@ -20,10 +17,9 @@ pub fn primary(theme: &Theme, status: Status) -> Style {
     match status {
         Status::Active | Status::Pressed => base,
         Status::Hovered => Style {
-            background: Some(Background::Color(palette.primary.strong.color)),
             shadow: Shadow {
                 color: palette.primary.base.color,
-                blur_radius: 7.5,
+                blur_radius: 5.0,
                 ..Default::default()
             },
             ..base
@@ -42,7 +38,7 @@ pub fn outline(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let base = Style {
         background: None,
-        text_color: palette.primary.weak.text,
+        text_color: palette.secondary.weak.color,
         border: border::rounded(radius::MD)
             .color(palette.primary.weak.text)
             .width(1),
