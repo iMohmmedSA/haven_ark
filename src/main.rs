@@ -6,7 +6,7 @@ mod views;
 
 use iced::window::Settings;
 
-use crate::app::App;
+use crate::{app::App, component::icons};
 
 fn main() -> iced::Result {
     let mut window_settings = Settings::default();
@@ -15,6 +15,7 @@ fn main() -> iced::Result {
     iced::application(App::new, App::update, App::view)
         .title(App::title)
         .theme(App::theme)
+        .font(icons::FONT)
         .window(window_settings)
         .run()
 }

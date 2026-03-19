@@ -3,7 +3,7 @@ use std::sync::Arc;
 use iced::{
     Task, Theme,
     theme::{Custom, Palette},
-    widget::{Button, Column, Text},
+    widget::{Column, Text},
 };
 
 use crate::{component::gate_view, constants::APP_NAME, theme::token::color};
@@ -34,7 +34,7 @@ impl App {
     }
 
     pub fn title(&self) -> String {
-        "APP_NAME".to_string()
+        APP_NAME.to_string()
     }
 }
 

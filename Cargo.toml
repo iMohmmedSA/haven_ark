@@ -6,3 +6,6 @@ edition = "2024"
 [dependencies]
 iced = { git = "https://github.com/iced-rs/iced", rev = "b655cb6ebf4a71ea16a4460bb987cb7c1bd0760e" }
 image = "0.25"
+
+[build-dependencies]
+icon = { git = "https://github.com/iMohmmedSA/icon", rev = "7cbc80f600a5a1fb4aa25887062e44ead56e2df2" }

@@ -1,3 +1,20 @@
+pub mod font_size {
+    /// 10px
+    pub const XS: f32 = 10.0;
+    /// 12px
+    pub const SM: f32 = 12.0;
+    /// 14px
+    pub const MD: f32 = 14.0;
+    /// 16px
+    pub const LG: f32 = 16.0;
+    /// 20px
+    pub const XL: f32 = 20.0;
+    /// 24px
+    pub const XXL: f32 = 24.0;
+    /// 32px
+    pub const DISPLAY: f32 = 32.0;
+}
+
 pub mod space {
     /// 4px
     pub const XS: f32 = 4.0;
