@@ -5,9 +5,12 @@ use iced::{
     theme::{Custom, Palette},
     widget::Text,
 };
+use plex_client::client::Client;
+use sysinfo::System;
 
 use crate::{
-    constants::APP_NAME,
+    app_data::AppData,
+    constants::{APP_NAME, APP_VERSION},
     theme::token::color,
     views::plex_sign_in_view::{self, PlexSignInView},
 };
@@ -24,14 +27,43 @@ pub enum Message {
 }
 
 #[derive(Debug)]
+pub struct State {
+    plex_client: Client,
+}
+
+impl State {
+    pub fn new(client_id: &str) -> Self {
+        let plex_client = Client::builder()
+            .client_identifier(client_id)
+            // .token(token)
+            .product(APP_NAME)
+            .version(APP_VERSION)
+            .platform(System::name().unwrap_or_default())
+            .platform_version(System::os_version().unwrap_or_default())
+            .build()
+            .unwrap_or_else(|e| panic!("Failed to build client, this is a bug: {e}"));
+
+        Self { plex_client }
+    }
+}
+
+#[derive(Debug)]
 pub struct App {
+    state: State,
+    data: AppData,
     view: View,
 }
 
 impl App {
     pub fn new() -> (Self, Task<Message>) {
+        let Ok(data) = AppData::load() else {
+            panic!("Failed to load app data")
+        };
+
         (
             Self {
+                state: State::new(&data.plex.client_id),
+                data,
                 view: View::PlexSignIn(PlexSignInView::new()),
             },
             Task::none(),

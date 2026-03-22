@@ -1,6 +1,8 @@
 mod app;
+mod app_data;
 mod component;
 mod constants;
+mod error;
 mod theme;
 mod views;
 
