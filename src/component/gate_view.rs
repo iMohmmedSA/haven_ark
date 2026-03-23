@@ -2,14 +2,14 @@ use iced::{
     Element,
     alignment::{Horizontal, Vertical},
     font::Weight,
-    widget::{Column, Container, Text, center, column, container, row, text::secondary},
+    widget::{Column, Text, center, column, container, row, text::secondary},
 };
 
 use crate::{
     component::Icons,
     constants::{APP_NAME, APP_VERSION},
     theme::{
-        style::{container::card, text::TextExt},
+        style::text::TextExt,
         token::{font_size, space},
     },
 };
@@ -30,9 +30,5 @@ pub fn gate_view<'a, M: 'a>(content: impl Into<Element<'a, M>>) -> Column<'a, M>
     )
     .padding(space::XXL);
 
-    column![header, body(content), footer].align_x(Horizontal::Center)
-}
-
-fn body<'a, M: 'a>(content: impl Into<Element<'a, M>>) -> Container<'a, M> {
-    center(Container::new(content).padding(space::XXL).style(card))
+    column![header, center(content), footer].align_x(Horizontal::Center)
 }

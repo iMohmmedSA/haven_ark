@@ -21,17 +21,17 @@ enum View {
     Tmp,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum Message {
     PlexSignIn(plex_sign_in_view::Message),
 }
 
 #[derive(Debug)]
-pub struct State {
+pub struct AppState {
     plex_client: Client,
 }
 
-impl State {
+impl AppState {
     pub fn new(client_id: &str) -> Self {
         let plex_client = Client::builder()
             .client_identifier(client_id)
@@ -49,7 +49,7 @@ impl State {
 
 #[derive(Debug)]
 pub struct App {
-    state: State,
+    state: AppState,
     data: AppData,
     view: View,
 }
@@ -59,12 +59,14 @@ impl App {
         let Ok(data) = AppData::load() else {
             panic!("Failed to load app data")
         };
+        let state = AppState::new(&data.plex.client_id);
+        let client = state.plex_client.clone();
 
         (
             Self {
-                state: State::new(&data.plex.client_id),
+                state,
                 data,
-                view: View::PlexSignIn(PlexSignInView::new()),
+                view: View::PlexSignIn(PlexSignInView::new(client)),
             },
             Task::none(),
         )
@@ -100,9 +102,11 @@ impl App {
         let View::PlexSignIn(view) = &mut self.view else {
             return Task::none();
         };
-        use plex_sign_in_view::Action::*;
+
+        use plex_sign_in_view::Action;
         match view.update(message) {
-            None => Task::none(),
+            Action::Task(task) => task.map(Message::PlexSignIn),
+            Action::None => Task::none(),
         }
     }
 }

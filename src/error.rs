@@ -13,4 +13,7 @@ pub enum Error {
 
     #[error("Serialization error: {0}")]
     Serialization(#[from] serde_json::Error),
+
+    #[error("Plex client error: {0}")]
+    PlexClient(#[from] plex_client::error::Error),
 }

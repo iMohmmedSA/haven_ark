@@ -3,6 +3,7 @@ mod app_data;
 mod component;
 mod constants;
 mod error;
+mod loadable;
 mod theme;
 mod views;
 

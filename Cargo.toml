@@ -10,7 +10,7 @@ repository = "https://github.com/iMohmmedSA/haven_ark"
 
 [dependencies]
 etcetera = "0.10"
-iced = { git = "https://github.com/iced-rs/iced", rev = "b655cb6ebf4a71ea16a4460bb987cb7c1bd0760e" }
+iced = { git = "https://github.com/iced-rs/iced", rev = "b655cb6ebf4a71ea16a4460bb987cb7c1bd0760e", features = ["tokio", "qr_code"] }
 image = "0.25"
 keyring = "3"
 open = "5"

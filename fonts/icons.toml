@@ -1,8 +1,8 @@
 module = "component::icons"
 
 [glyphs]
-right_arrow = "material-symbols::arrow-right-alt-rounded"
-key = "material-symbols::key-outline-rounded"
+RightArrow = "material-symbols::arrow-right-alt-rounded"
+Key = "material-symbols::key-outline-rounded"
 
 [local_assets]
-logo = "logo"
+Logo = "logo"
