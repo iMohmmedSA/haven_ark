@@ -16,4 +16,7 @@ pub enum Error {
 
     #[error("Plex client error: {0}")]
     PlexClient(#[from] plex_client::error::Error),
+
+    #[error("HEX error: {0}")]
+    Hex(#[from] hex::FromHexError),
 }

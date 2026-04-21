@@ -19,8 +19,10 @@ pub struct PlexData {
     pub client_id: String,
 }
 
-pub enum SecureStore {
+pub enum SecureStorage {
     PlexToken,
+    PlexSigninKey,
+    PlexKid,
 }
 
 impl AppData {
@@ -64,10 +66,14 @@ impl AppData {
 
 impl Default for AppData {
     fn default() -> Self {
-        Self {
+        let app = Self {
             version: 0,
             plex: PlexData::default(),
-        }
+        };
+
+        // TODO: find a better way to handle this if errors occur
+        let _ = app.save();
+        app
     }
 }
 
@@ -79,10 +85,12 @@ impl Default for PlexData {
     }
 }
 
-impl SecureStore {
+impl SecureStorage {
     pub fn service(&self) -> &'static str {
         match self {
-            SecureStore::PlexToken => "plex_token",
+            SecureStorage::PlexToken => "plex_token",
+            SecureStorage::PlexSigninKey => "plex_signin_key",
+            SecureStorage::PlexKid => "plex_kid",
         }
     }
 
@@ -95,6 +103,16 @@ impl SecureStore {
         let entry = Entry::new(self.service(), APP_NAME_ID)?;
         entry.set_password(value.as_ref())?;
         Ok(())
+    }
+
+    pub fn set_bytes(&self, value: &[u8]) -> Result<()> {
+        let hex = hex::encode(value);
+        self.set(hex)
+    }
+
+    pub fn get_bytes(&self) -> Result<Vec<u8>> {
+        let hex = self.get()?;
+        Ok(hex::decode(hex)?)
     }
 
     pub fn delete(&self) -> Result<()> {

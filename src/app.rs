@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use iced::{
-    Element, Task, Theme,
+    Element, Subscription, Task, Theme,
     theme::{Custom, Palette},
     widget::Text,
 };
@@ -9,15 +9,19 @@ use plex_client::client::Client;
 use sysinfo::System;
 
 use crate::{
-    app_data::AppData,
+    app_data::{AppData, SecureStorage},
     constants::{APP_NAME, APP_VERSION},
     theme::token::color,
-    views::plex_sign_in_view::{self, PlexSignInView},
+    views::{
+        fatal_view::fatal_view,
+        plex_sign_in_view::{self, PlexSignInView},
+    },
 };
 
 #[derive(Debug)]
 enum View {
     PlexSignIn(PlexSignInView),
+    Fatal(String),
     Tmp,
 }
 
@@ -35,11 +39,11 @@ impl AppState {
     pub fn new(client_id: &str) -> Self {
         let plex_client = Client::builder()
             .client_identifier(client_id)
-            // .token(token)
+            .maybe_token(SecureStorage::PlexToken.get().ok())
             .product(APP_NAME)
             .version(APP_VERSION)
-            .platform(System::name().unwrap_or_default())
-            .platform_version(System::os_version().unwrap_or_default())
+            .maybe_platform(System::name())
+            .maybe_platform_version(System::os_version())
             .build()
             .unwrap_or_else(|e| panic!("Failed to build client, this is a bug: {e}"));
 
@@ -89,6 +93,14 @@ impl App {
     pub fn title(&self) -> String {
         APP_NAME.to_string()
     }
+
+    pub fn subscription(&self) -> Subscription<Message> {
+        match &self.view {
+            View::PlexSignIn(view) => view.subscription().map(Message::PlexSignIn),
+            View::Fatal(_) => Subscription::none(),
+            View::Tmp => Subscription::none(),
+        }
+    }
 }
 
 impl App {
@@ -105,6 +117,11 @@ impl App {
 
         use plex_sign_in_view::Action;
         match view.update(message) {
+            Action::UpdatePlexToken(_) => todo!(),
+            Action::Fatal(msg) => {
+                self.view = View::Fatal(msg);
+                Task::none()
+            }
             Action::Task(task) => task.map(Message::PlexSignIn),
             Action::None => Task::none(),
         }
@@ -115,6 +132,7 @@ impl App {
     pub fn view(&self) -> Element<'_, Message> {
         match &self.view {
             View::PlexSignIn(view) => view.view().map(Message::PlexSignIn).into(),
+            View::Fatal(msg) => fatal_view(msg).into(),
             View::Tmp => Text::new("fragment").into(),
         }
     }

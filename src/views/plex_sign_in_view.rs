@@ -1,7 +1,10 @@
+use std::time::Duration;
+
 use iced::{
-    Element, Length, Padding, Size, Task,
+    Element, Length, Padding, Size, Subscription, Task,
     alignment::{Horizontal, Vertical},
     font::Weight,
+    time,
     widget::{
         self, Button, Column, Container, Sensor, Space, Text, center, column, qr_code, row, rule,
         space::horizontal, text::secondary,
@@ -13,6 +16,7 @@ use plex_client::{
 };
 
 use crate::{
+    app_data::SecureStorage,
     component::{Icons, gate_view},
     constants::GITHUB_URL,
     loadable::Loadable,
@@ -28,6 +32,8 @@ use crate::{
 };
 
 pub enum Action {
+    UpdatePlexToken(String),
+    Fatal(String),
     Task(Task<Message>),
     None,
 }
@@ -38,6 +44,7 @@ pub enum Message {
     OpenPlexSignIn,
     Loading(Size),
     RequestPin(Loadable<PinResponse>),
+    Polling,
 }
 
 #[derive(Debug)]
@@ -57,6 +64,10 @@ impl PlexSignInView {
             qr_code: None,
         }
     }
+
+    pub fn subscription(&self) -> Subscription<Message> {
+        time::every(Duration::from_secs_f32(4.0)).map(|_| Message::Polling)
+    }
 }
 
 impl PlexSignInView {
@@ -66,6 +77,7 @@ impl PlexSignInView {
             Message::OpenPlexSignIn => self.handle_open_plex_sign_in(),
             Message::Loading(_) => self.handle_loading(),
             Message::RequestPin(pin_response) => self.handle_request_pin(pin_response),
+            Message::Polling => self.handle_polling(),
         }
     }
 
@@ -99,12 +111,52 @@ impl PlexSignInView {
 
     fn handle_request_pin(&mut self, pin_response: Loadable<PinResponse>) -> Action {
         self.pins = pin_response;
-        let url = match &self.pins {
-            Loadable::Loaded(pin_response) => self.client.auth_url(&pin_response, None),
+
+        let pins = match &self.pins {
+            Loadable::Loaded(pin_response) => pin_response,
             _ => return Action::None,
         };
+
+        if pins.expires_in < 100 && None == pins.auth_token {
+            return self.handle_loading();
+        }
+
+        if let Some(auth_token) = &pins.auth_token {
+            if let Err(e) = SecureStorage::PlexKid
+                .set(self.keypair.kid())
+                .and_then(|_| {
+                    SecureStorage::PlexSigninKey.set_bytes(&self.keypair.private_key_bytes())
+                })
+                .and_then(|_| SecureStorage::PlexToken.set(auth_token))
+            {
+                return Action::Fatal(e.to_string());
+            }
+
+            return Action::UpdatePlexToken(auth_token.clone());
+        }
+
+        let url = self.client.auth_url(&pins, None);
+
         self.qr_code = qr_code::Data::new(&url).ok();
         Action::None
+    }
+
+    fn handle_polling(&mut self) -> Action {
+        let pin_response = match &self.pins {
+            Loadable::Loaded(pin_response) => pin_response.clone(),
+            _ => return Action::None,
+        };
+
+        let client = self.client.clone();
+        let keypair = self.keypair.clone();
+
+        Action::Task(Task::perform(
+            async move { client.poll_pin(pin_response.id, &keypair).await },
+            |res| match res {
+                Ok(pin_response) => Message::RequestPin(Loadable::Loaded(pin_response)),
+                Err(e) => Message::RequestPin(Loadable::Error(e.to_string())),
+            },
+        ))
     }
 }
 
